@@ -1,0 +1,69 @@
+# Java & Spring Boot
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.idea/
+*.project
+*.classpath
+.settings/
+bin/
+out/
+
+# Maven
+.mvn/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Node.js & JavaScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+coverage/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# AWS
+.aws/
+*.pem
+*.key
+*.crt
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.history/
+.sass-cache/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Angular
+.angular/
+.angular/cache/
+connect.lock
+testem.log
+typings/
+libpeerconnection.log
+
+# Others
+logs/
+*.log
