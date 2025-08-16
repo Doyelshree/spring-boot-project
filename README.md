@@ -58,24 +58,6 @@ A comprehensive full-stack application built with **Spring Boot** (Java) for the
 
 ---
 
-## Project Structure
-
-full-stack-professional/
-├── backend/
-│ ├── src/
-│ ├── pom.xml
-│ └── ...
-├── frontend/
-│ └── react/
-│ ├── src/
-│ ├── public/
-│ ├── package.json
-│ └── ...
-├── .gitignore
-└── README.md
-
----
-
 ## Getting Started
 
 ### Backend Setup (Spring Boot)
