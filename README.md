@@ -93,7 +93,7 @@ A comprehensive full-stack application built with **Spring Boot** (Java) for the
 
 ---
 
-### Environment Variables
+### Environment Variables - 
 Create a .env file in frontend/react/ for frontend configuration:
 `REACT_APP_API_URL=http://localhost:8080`
 For backend, configure application.properties for database and other settings.
