@@ -10,10 +10,11 @@ A comprehensive full-stack application built with **Spring Boot** (Java) for the
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
-  - [Backend Setup (Spring Boot)](#backend-setup-spring-boot)
-  - [Frontend Setup (React)](#frontend-setup-react)
+    - [Backend Setup (Spring Boot)](#backend-setup-spring-boot)
+    - [Frontend Setup (React)](#frontend-setup-react)
 - [Usage](#usage)
 - [Environment Variables](#environment-variables)
+- [AWS S3 Integration](#aws-s3-integration)
 - [Testing](#testing)
 - [Scripts](#scripts)
 - [Contributing](#contributing)
@@ -64,21 +65,25 @@ A comprehensive full-stack application built with **Spring Boot** (Java) for the
 
 1. **Install Java (JDK 17+) and Maven**
 2. Navigate to `backend/` and run:
-`mvn clean install`
-`mvn spring-boot:run`
-3. The API will be available at `http://localhost:8080`
+   ```bash
+   mvn clean install
+   mvn spring-boot:run
+   ```
+3. The API will be available at http://localhost:8080
 
 ### Frontend Setup (React)
 
-1. **Install Node.js (v16+) and npm**
-2. Navigate to `frontend/react/` and run:
-`npm install`
-`npm start`
-3. The app will be available at `http://localhost:3000`
+1. Install Node.js (v16+) and npm
+2. Navigate to frontend/react/ and run:
+   ```bash
+   npm install
+   npm start
+   ```
+3. The app will be available at http://localhost:3000
 
 ---
 
-## Usage
+### Usage
 
 - Access the frontend in your browser.
 - Register/login as a user.
@@ -88,33 +93,55 @@ A comprehensive full-stack application built with **Spring Boot** (Java) for the
 
 ---
 
-## Environment Variables
-
-Create a `.env` file in `frontend/react/` for frontend configuration:
-
-REACT_APP_API_URL=http://localhost:8080
-
-For backend, configure `application.properties` for database and other settings.
+### Environment Variables
+Create a .env file in frontend/react/ for frontend configuration:
+`REACT_APP_API_URL=http://localhost:8080`
+For backend, configure application.properties for database and other settings.
 
 ---
 
-## Testing
+### AWS S3 Integration
+AWS S3 is used in this project for storing and serving customer profile pictures. The backend integrates with AWS S3 to handle file uploads, retrieval, and deletion securely. When a user uploads a profile picture via the React frontend, the image is sent to the Spring Boot backend, which then uploads it to an S3 bucket. The S3 image URL is stored and used to display the profile picture in the application.
+- Purpose: Used for storing customer profile pictures and other file uploads.
 
-**Backend:**
+- Backend: Spring Boot handles file upload, retrieval, and deletion with AWS S3 SDK.
+
+- Frontend: React fetches and displays images using S3 URLs.
+
+- Configuration:
+
+ - - Set AWS credentials and S3 bucket details in application.properties.
+
+- - Ensure IAM permissions for S3 access.
+
+Example properties:
+```bash
+aws.s3.bucket-name=your-bucket-name
+aws.access-key=your-access-key
+aws.secret-key=your-secret-key
+aws.region=your-region
+```
+
+#### Note:
+Do not commit sensitive AWS credentials to version control. Use environment variables or a secure secrets manager.
+
+---
+
+### Testing
+#### Backend:
 `mvn test`
+#### Frontend:
 
-**Frontend:**
 `npm test`
 
 ---
 
-## Scripts
+### Scripts
+####  Backend:
+- `mvn clean install`-Build the backend
+- `mvn spring-boot:run`— Run the backend server
 
-**Backend:**
-- `mvn clean install` — Build the backend
-- `mvn spring-boot:run` — Run the backend server
-
-**Frontend:**
+#### Frontend
 - `npm install` — Install dependencies
 - `npm start` — Start development server
 - `npm run build` — Build for production
@@ -122,26 +149,23 @@ For backend, configure `application.properties` for database and other settings.
 
 ---
 
-## Contributing
-
+### Contributing
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/YourFeature`)
-3. Commit your changes (`git commit -am 'Add new feature'`)
-4. Push to the branch (`git push origin feature/YourFeature`)
+2. Create your feature branch:
+   ```bash
+   git checkout -b feature/YourFeature
+   ```
+3. Commit your changes:
+   ```bash
+   git commit -am 'Add new feature'
+   ```
+4. Push to the branch:
+   ```bash
+   git push origin feature/YourFeature
+   ```
 5. Create a Pull Request
 
 ---
 
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
----
-
-## Contact
-
-For questions or support, open an issue on GitHub or contact the maintainer.
-
----
-
-**Happy Coding!**
+### License
+This project is licensed under the MIT License. See the LICENSE file for details.
