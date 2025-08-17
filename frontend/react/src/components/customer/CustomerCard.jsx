@@ -15,16 +15,65 @@ import {
     useColorModeValue, useDisclosure,
 } from '@chakra-ui/react';
 
-import {useRef} from 'react'
+import {useRef, useState, useEffect, useCallback} from 'react'
 import {deleteCustomer} from "../../services/client.js";
 import {errorNotification, successNotification} from "../../services/notification.js";
 import UpdateCustomerDrawer from "./UpdateCustomerDrawer.jsx";
+import {customerProfilePictureUrl} from "../../services/client.js";
 
 export default function CardWithImage({id, name, email, age, gender, imageNumber, fetchCustomers}) {
-    const randomUserGender = gender === "MALE" ? "men" : "women";
+    const [avatarUrl, setAvatarUrl] = useState(null);
+    const [isLoadingAvatar, setIsLoadingAvatar] = useState(true);
 
     const { isOpen, onOpen, onClose } = useDisclosure()
     const cancelRef = useRef()
+
+    // Function to load avatar image with authentication
+    const loadAvatarImage = useCallback(async () => {
+        setIsLoadingAvatar(true);
+        try {
+            const response = await fetch(`${customerProfilePictureUrl(id)}?t=${Date.now()}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("access_token")}`
+                }
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                setAvatarUrl(url);
+            } else {
+                console.log("Failed to load avatar image for customer", id);
+                setAvatarUrl(null);
+            }
+        } catch (error) {
+            console.error("Error loading avatar image:", error);
+            setAvatarUrl(null);
+        } finally {
+            setIsLoadingAvatar(false);
+        }
+    }, [id]);
+
+    // Load avatar image on component mount
+    useEffect(() => {
+        loadAvatarImage();
+
+        // Cleanup blob URL
+        return () => {
+            if (avatarUrl) {
+                URL.revokeObjectURL(avatarUrl);
+            }
+        };
+    }, [loadAvatarImage]);
+
+    // Default placeholder for avatar
+    const defaultAvatarImage = `data:image/svg+xml;base64,${btoa(`
+        <svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="64" cy="64" r="64" fill="#e2e8f0"/>
+            <circle cx="64" cy="48" r="20" fill="#a0aec0"/>
+            <path d="M20 110 Q64 80 108 110 L108 128 L20 128 Z" fill="#a0aec0"/>
+        </svg>
+    `)}`;
 
     return (
         <Center py={6}>
@@ -48,10 +97,9 @@ export default function CardWithImage({id, name, email, age, gender, imageNumber
                 <Flex justify={'center'} mt={-12}>
                     <Avatar
                         size={'xl'}
-                        src={
-                            `https://randomuser.me/api/portraits/${randomUserGender}/${imageNumber}.jpg`
-                        }
-                        alt={'Author'}
+                        src={avatarUrl || defaultAvatarImage}
+                        alt={'Customer Avatar'}
+                        opacity={isLoadingAvatar ? 0.6 : 1}
                         css={{
                             border: '2px solid white',
                         }}

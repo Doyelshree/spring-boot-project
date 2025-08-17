@@ -64,12 +64,14 @@ export const login = async (usernameAndPassword) => {
 
 export const uploadCustomerProfilePicture = async (id, formData) => {
     try {
-        return axios.post(
+        return await axios.post(
             `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${id}/profile-image`,
             formData,
             {
-                ...getAuthConfig(),
-                'Content-Type' : 'multipart/form-data'
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("access_token")}`
+                    // Don't set Content-Type for FormData - let axios handle it
+                }
             }
         );
     } catch (e) {
@@ -77,5 +79,5 @@ export const uploadCustomerProfilePicture = async (id, formData) => {
     }
 }
 
-export const customerProfilePictureUrl = (customerId) =>
-    `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${customerId}/profile-image`;
+export const customerProfilePictureUrl = (id) =>
+    `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${id}/profile-image`;

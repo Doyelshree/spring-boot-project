@@ -3,14 +3,10 @@ import * as Yup from 'yup';
 import {Alert, AlertIcon, Box, Button, FormLabel, Image, Input, Stack, VStack} from "@chakra-ui/react";
 import {customerProfilePictureUrl, updateCustomer, uploadCustomerProfilePicture} from "../../services/client.js";
 import {errorNotification, successNotification} from "../../services/notification.js";
-import {useCallback} from "react";
+import {useCallback, useState, useEffect} from "react";
 import {useDropzone} from "react-dropzone";
 
-
 const MyTextInput = ({label, ...props}) => {
-    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
-    // which we can spread on <input>. We can use field meta to show an error
-    // message if the field is invalid and it has been touched (i.e. visited)
     const [field, meta] = useField(props);
     return (
         <Box>
@@ -26,23 +22,27 @@ const MyTextInput = ({label, ...props}) => {
     );
 };
 
-const MyDropzone = ({ customerId, fetchCustomers }) => {
+const MyDropzone = ({ customerId, fetchCustomers, onImageUpload }) => {
     const onDrop = useCallback(acceptedFiles => {
+        console.log("Uploading file:", acceptedFiles[0]);
         const formData = new FormData();
         formData.append("file", acceptedFiles[0])
 
         uploadCustomerProfilePicture(
             customerId,
             formData
-        ).then(() => {
+        ).then((response) => {
+            console.log("Upload response:", response);
             successNotification("Success", "Profile picture uploaded")
             fetchCustomers()
-        }).catch(() => {
-            errorNotification("Error", "Profile picture failed upload")
+            onImageUpload() // Trigger image refresh
+        }).catch((error) => {
+            console.error("Upload error:", error.response?.data || error);
+            errorNotification("Error", `Profile picture upload failed: ${error.response?.data?.message || error.message}`)
         })
-    }, [])
-    const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
+    }, [customerId, fetchCustomers, onImageUpload])
 
+    const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
     return (
         <Box {...getRootProps()}
@@ -63,22 +63,82 @@ const MyDropzone = ({ customerId, fetchCustomers }) => {
     )
 }
 
-
-// And now we can use these
 const UpdateCustomerForm = ({fetchCustomers, initialValues, customerId}) => {
-    const profileImageUrl = customerProfilePictureUrl(customerId) + `?t=${Date.now()}`;
+    const [imageKey, setImageKey] = useState(Date.now());
+    const [imageUrl, setImageUrl] = useState(null);
+    const [isLoadingImage, setIsLoadingImage] = useState(true);
+
+    // Function to load image with authentication
+    const loadImage = useCallback(async () => {
+        setIsLoadingImage(true);
+        try {
+            const response = await fetch(`${customerProfilePictureUrl(customerId)}?t=${imageKey}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("access_token")}`
+                }
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                setImageUrl(url);
+                console.log("Image loaded successfully");
+            } else {
+                console.log("Failed to load image:", response.status, response.statusText);
+                setImageUrl(null);
+            }
+        } catch (error) {
+            console.error("Error loading image:", error);
+            setImageUrl(null);
+        } finally {
+            setIsLoadingImage(false);
+        }
+    }, [customerId, imageKey]);
+
+    // Load image on component mount and when imageKey changes
+    useEffect(() => {
+        loadImage();
+
+        // Cleanup previous blob URL
+        return () => {
+            if (imageUrl) {
+                URL.revokeObjectURL(imageUrl);
+            }
+        };
+    }, [loadImage]);
+
+    const handleImageUpload = useCallback(() => {
+        console.log("Refreshing image with new timestamp");
+        setImageKey(Date.now());
+    }, []);
+
+    // Default placeholder image as data URI
+    const placeholderImage = `data:image/svg+xml;base64,${btoa(`
+        <svg width="150" height="150" xmlns="http://www.w3.org/2000/svg">
+            <rect width="150" height="150" fill="#e2e8f0"/>
+            <circle cx="75" cy="60" r="20" fill="#a0aec0"/>
+            <path d="M30 120 Q75 90 120 120 L120 150 L30 150 Z" fill="#a0aec0"/>
+            <text x="75" y="140" font-family="Arial" font-size="10" fill="#718096" text-anchor="middle">Profile Picture</text>
+        </svg>
+    `)}`;
+
     return (
         <>
             <VStack spacing={'5'} mb={'5'}>
-                <img
-                    borderRadius="full"
-                    boxSize="150px"
-                    src={profileImageUrl}
+                <Image
+                    borderRadius={"full"}
+                    boxSize={"150px"}
+                    objectFit={"cover"}
+                    src={imageUrl || placeholderImage}
                     alt="Profile"
+                    opacity={isLoadingImage ? 0.6 : 1}
+                    transition="opacity 0.2s"
                 />
+                {isLoadingImage && <Box fontSize="sm" color="gray.500">Loading image...</Box>}
                 <MyDropzone
                     customerId={customerId}
                     fetchCustomers={fetchCustomers}
+                    onImageUpload={handleImageUpload}
                 />
             </VStack>
             <Formik
