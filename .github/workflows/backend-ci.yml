@@ -10,6 +10,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      TZ: UTC
+      SPRING_PROFILES_ACTIVE: test
     services:
       postgres:
         image: postgres:14.1
@@ -17,6 +20,8 @@ jobs:
           POSTGRES_USER: amigoscode
           POSTGRES_PASSWORD: password
           POSTGRES_DB: customer
+          TZ: UTC
+          PGTZ: UTC
         ports:
           - 5332:5432
         options: >-
@@ -36,4 +41,6 @@ jobs:
           java-version: '17'
           cache: 'maven'
       - name: Build and run Unit/Integration Tests with Maven
-        run: mvn -ntp -B verify
+        run: mvn -ntp -B verify -Duser.timezone=UTC -Dfile.encoding=UTF-8
+        env:
+          TZ: UTC

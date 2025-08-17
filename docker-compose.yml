@@ -6,7 +6,8 @@ services:
       POSTGRES_USER: amigoscode
       POSTGRES_PASSWORD: password
       PGDATA: /data/postgres
-        - TZ=Asia/Kolkata
+      TZ: UTC
+      PGTZ: UTC
     volumes:
       - db:/data/postgres
     ports:
@@ -14,7 +15,6 @@ services:
     networks:
       - db
     restart: unless-stopped
-
 
 networks:
   db:

@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5332/customer?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8
+    username: amigoscode
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
+  test:
+    database:
+      replace: none
+
+logging:
+  level:
+    com.amigoscode: DEBUG
+    org.springframework.test: DEBUG

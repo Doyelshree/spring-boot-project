@@ -235,6 +235,18 @@
                     </to>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M9</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <user.timezone>UTC</user.timezone>
+                        <file.encoding>UTF-8</file.encoding>
+                    </systemPropertyVariables>
+                    <argLine>-Duser.timezone=UTC -Dfile.encoding=UTF-8</argLine>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

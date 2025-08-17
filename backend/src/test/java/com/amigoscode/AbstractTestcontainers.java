@@ -22,7 +22,9 @@ public abstract class AbstractTestcontainers {
             new PostgreSQLContainer<>("postgres:latest")
                     .withDatabaseName("amigoscode-dao-unit-test")
                     .withUsername("amigoscode")
-                    .withPassword("password");
+                    .withPassword("password")
+                    .withEnv("TZ", "UTC")  // Set container timezone to UTC
+                    .withCommand("postgres", "-c", "timezone=UTC"); // Force PostgreSQL to use UTC
 
     private static String getFixedJdbcUrl() {
         return postgreSQLContainer.getJdbcUrl() + "&TimeZone=UTC";
